@@ -1,0 +1,141 @@
+1. Python / Haskell / Perl / Your prefered scripting language.
+a) array = [['a','b','c'],['d','e','f']]
+How do I get this output?
+a
+b
+c
+d
+e
+f
+
+MY ANS: 
+(Python)
+In[1] array = [['a','b','c'],['d','e','f']]
+
+In[2] for i in range(2):
+          for j in range(3):
+              print array[i][j]
+
+              
+b) Have a look at "programming-tasks/top10_sample.csv"
+Each line in this file represents a list of Brand in our store.
+Write a script to print out a list of brand names and their occurrence counts (sorted).
+
+My ANS:
+(Python)
+import pandas as pd  
+with open('top10_sample.csv') as f:
+    content = f.readlines()
+df = pd.DataFrame(columns=['brand', 'occurrences'])
+df['brand'] = df['brand'].astype(str)
+df['occurrences'] = df['occurrences'].astype(int)
+count = 0
+for i in range(len(content)-1):
+    if content[i] != content[i+1]:
+        df.loc[count] = [content[i], content.count(content[i])]
+        count += 1
+print df
+
+
+2. SQL
+a) What is the relation between Database, Schema, Tables, View in PostgreSQL / MySQL?
+b) What is the difference between a table and a view?
+c) Table reporting.items has 4 columns: Item_Code - Date - Visits - Orders
+Write a query to get total number of Visit over all Item_Codes for the day '2013-01-12'.
+Write a query to get total number of visit over all Item_Codes for every year?.
+d) As a DBA: in PostgreSQL DB, write query(s) needed to give account "buying" access to all tables currently in schema "sales", and all future Tables created in schema "sales".
+
+MY ANS: 
+a) In MySQL, schema and database are synonyms, and they can be used exchangably: 
+CREATE SCHEMA schema1;
+DROP DATABASE schema1;
+or 
+CREATE DATABASE db1;
+DROP SCHEMA db1;
+And a table is one of the objects in a database. A database may also contain views, stored procedures and so on, but mainly tables. 
+
+b) A table contains data, while a view is just a SELECT statement selecting data from one or more tables and stored in database. 
+A view can, however, join data from multiple tables and create a new "table" out of them. You can create and save a query of a view and sue SELECT * FROM view to access the data. 
+
+c) SELECT SUM(VISITS) FROM reporting.items WHERE DATE = “2013-01-12”;
+   SELECT LEFT(DATE,4), SUM(VISITS) FROM reporting.items GROUP BY LEFT(DATE,4);
+   
+d) GRANT ALL PRIVILEGES ON ALL TABLES TO buying IN SCHEMA sales;
+   ALTER DEFAULT PRIVILEGES GRANT ALL ON TABLES TO buying IN SCHEMA sales ;
+
+              
+3. Bash scripting
+a) Write a bash script for the below set of tasks:
+[
+- connect to ftp server (host=10.11.12.13 port=22 username=helloFTP password=world)
+- download all files that have their name started with "webtrekk_marketing" into "home/Marketing Report/Data/"
+- run ZMR.py which is located in "home/Marketing Report/Scripts/"
+- run UpdateWebtrekk.sql which is located in "home/Marketing Report/Scripts/" on a PostgreSQL DB (host=10.11.12.13 port=5439 database=zalora username=helloDB password=world)
+]
+How would you schedule the above as a cpythonron job every day at 2.35am?
+
+ -- ftpScript.sh --
+#!/usr/bin/expect
+
+set timeout 3
+spawn ftp 10.11.12.13
+expect "Name:\r"
+send "helloFTP\r"
+expect "Password:"
+send "world\r"
+expect "ftp>"
+send "ls -la\r"
+expect "ftp>"
+send "binary\r"
+expect "ftp>"
+send "prompt\r"
+expect "ftp>"
+send "mget webtrekk_marketing*\r"
+expect "ftp>"
+send "bye\r"
+
+ -- mainScript.sh --
+#!/bin/bash
+
+WORK_DIR="/home/Marketing Report/Data/"
+
+cd {$WORK_DIR} 
+./ftpScript.sh
+
+PY_SCRIPTS="/home/Marketing Report/Scripts/"
+cd {$PY_SCRIPTS}
+python ZMR.py
+
+#SQL_SCRIPTS="/home/Marketing Report/Scripts/"
+PGPASSWORD='world'
+psql -h 10.11.12.13 -p 5439 -d zalora -U helloDB 
+
+exit
+
+ -- Cron job scheduling -- 
+'crontab -e'
+35 2 * * * /path/mainScript.sh
+
+b) Have a look at the folder "/programming-tasks/bash/"
+- Write a bash script to rename all files below from "zalora-*" to "Zalora-*"
+
+for i in zalora-*; do
+	mv "$i" "${i//z/Z}";
+done
+
+
+- All Zalora-* files contain a single string: "this is a test." (with a new line at the end):
+- Write a shell script to change the content of those files to all uppercase.
+
+for file in Zalora-*; do
+	CONTENT=$(cat $file)
+	echo "${CONTENT^^}" > $file;
+done
+
+- Write a shell script to remove all dot character (.) within those files.
+
+for file in Zalora-*; do
+	CONTENT=$(cat $file)
+	echo "${CONTENT//./}" > $file
+done
+
