@@ -75,8 +75,8 @@ a) Write a bash script for the below set of tasks:
 How would you schedule the above as a cpythonron job every day at 2.35am?
 
  -- ftpScript.sh --
+ 
 #!/usr/bin/expect
-
 set timeout 3
 spawn ftp 10.11.12.13
 expect "Name:\r"
@@ -95,21 +95,17 @@ expect "ftp>"
 send "bye\r"
 
  -- mainScript.sh --
+ 
 #!/bin/bash
-
 WORK_DIR="/home/Marketing Report/Data/"
-
 cd {$WORK_DIR} 
 ./ftpScript.sh
-
 PY_SCRIPTS="/home/Marketing Report/Scripts/"
 cd {$PY_SCRIPTS}
 python ZMR.py
-
 #SQL_SCRIPTS="/home/Marketing Report/Scripts/"
 PGPASSWORD='world'
 psql -h 10.11.12.13 -p 5439 -d zalora -U helloDB 
-
 exit
 
  -- Cron job scheduling -- 
